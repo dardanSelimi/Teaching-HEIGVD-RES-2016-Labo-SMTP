@@ -1,69 +1,80 @@
-# Teaching-HEIGVD-RES-2016-Labo-SMTP
+RES - LAB 02 - HEIG-VD 
+===================
 
-## Objectives
+Repository for the SMTP client lab.
 
-In this lab, you will develop a client application (TCP) in Java. This client application will use the Socket API to communicate with a SMTP server. The code that you write will include a **partial implementation of the SMTP protocol**. These are the objectives of the lab:
+----------
+#Description Of The Project
+-------------
 
-* Make practical experiments to become familiar with the **SMTP protocol**. After the lab, you should be able to use a command line tool to **communicate with a SMTP server**. You should be able to send well-formed messages to the server, in order to send emails to the address of your choice.
+###**Technologies used**
 
-* Understand the notions of **test double** and **mock server**, which are useful when developing and testing a client-server application. During the lab, you will setup and use such a **mock server**.
+JAVA 8, MockMock Server, Netbeans 8.0.2
 
-* Understand what it means to **implement the SMTP protocol** and be able to send e-mail messages, by working directly on top of the Socket API (i.e. you are not allowed to use a SMTP library).
+###**Descrption**
+A simple SMTP client which goal is to send e-mails to a list of addresses. A mock SMTP server is used. The main purpose of this project is to implement a SMTP client.
 
-* **See how easy it is to send forged e-mails**, which appear to be sent by certain people but in reality are issued by malicious users.
+###**Installation**
+**Step 1**: Clone the repository into yours.  
+**Step 2**: Launch the "MockMock.jar". Instructions can be found in the section "Mock SMTP Server Installation"  
+**Step 3**: Move the files *appconfig.properties*, *emails.txt*, *messages.txt* to the repertory where MailRobot.jar is located. Example: c:\test\MailRobot.jar -> config files must be placed into c:\test\  
+**Step 4**: Compile and  the "MailRobot.jar" using "java -jar MailRobot.jar" in your prompt.  
 
-* **Design a simple object-oriented model** to implement the functional requirements described in the next paragraph.
+###**Configuration**
+> ***appconfig.properties*** is the file in which all the configuration propreties are stored. 
+>
+ - field : smtpServerAddress --> localhost by default but it can be edited.  
+ - field : smtpServerPort   --> Cannot be edited since it is the   assigned port of the SMTP protocol. 
+ - field : numberOfGroups --> Depends on the number of e-mails you want to use. 
+The composition of a group is "One sender and two receivers". So three e-mail addresses means  one group. For example, to be able to send e-mails to two groups, emails.txt must contain at least six e-mail adrresses.
+ - field : emails --> emails.txt is the file in which the list of e-mail addresses is stored.
+ - field : messages --> messages.txt is the file in which the textual content of the e-mails to send is stored. Attention, one message only is possible with our implementation.
 
+###**Implementation**
+ Please, have a look at the figure stored in the *figures * repertory. The file *diagram.png* contains the class diagram of the project.
+   ![class diagram](/figures/diagram.png)
+ **Organizer.java**: Important class in which all the necessary information are collected from the different files. 
+ Class functions: 
+ -- readMessages() open the file *message.txt* in which the message to send is stored. 
+ -- readEmails() open the *email.txt* file where the list of e-mail address is stored
+ -- generateGroups() creates the wanted number of groups. The number of groups depends on the number of e-mail address and the field numberOfGroups of the configuration file *appconfig.properties*
+ 
+**SmtpClient.java**: The SMTP client. This class can connect to a SMTP server and send messages. The protocol used in our implementation is the one recommended by RFC standards:
 
+>Example:  
+telnet smtp.xxxx.xxxx/IP address 25  
+Connected to smtp.xxxx.xxxx./IP address  
+220 smtp.xxxx.xxxx SMTP Ready  
+EHLO client  
+250-smtp.xxxx.xxxx  
+250-PIPELINING  
+250 8BITMIME         
+MAIL FROM: <author@yyyy.yyyy>  
+250 Sender ok  
+RCPT TO: <dest@xxxx.xxxx>  
+250 Recipient ok.  
+DATA  
+354 Enter mail, end with "."   
+Subject: Test  
+>
+Corps du texte 
+> 
+.  
+250 Ok  
+QUIT  
+221 Closing connection  
+Connection closed by foreign host.   
 
+**Person.java**: Representation of a person for whom we want to send an e-mail. Contains the e-mail address as a private attribut.
+**Group.java**: A group of persons.
+**Message.java**: The message we want to send.
 
-## Functional requirements
+###**Mock SMTP Server Installation**
+ A jar file is included in the root of the repo. The command to execute the program in any promp is "java -jar MockMock.jar -p 25", where -p is the port used by the server. Be carreful, you should always have the lastest java version installed on your system.
 
-Your mission is to develop a client application that automatically plays pranks on a list of victims:
+###**Mock SMTP Server Information**
+A Mocker Server allows to mock any server or service that you connect to over SMTP (in our case). It can easily recreate all types of responses for SMTP services to test applications easily and efficiently.
 
-* The user should be able to **define a list of victims** (concretely, you should be able to create a file containing a list of e-mail addresses).
-
-* The user should be able to **define how many groups of victims should be formed** in a given campaign. In every group of victims, there should be 1 sender and at least 2 recipients (i.e. the minimum size for a group is 3).
-
-* The user should be able to **define a list of e-mail messages**. When a prank is played on a group of victims, then one of these messages should be selected. **The mail should be sent to all group recipients, from the address of the group sender**. In other words, the recipient victims should be lead to believe that the sender victim has sent them.
-
-
-## Example
-
-Consider that your program generates a group G1. The group sender is Bob. The group recipients are Alice, Claire and Peter. When the prank is played on group G1, then your program should pick one of the fake messages. It should communicate with a SMTP server, so that Alice, Claire and Peter receive an e-mail, which appears to be sent by Bob.
-
-
-## Deliverables
-
-You will deliver the results of your lab in a GitHub repository. 
-
-Your repository should contain both the source code of your Java project and your report. Your report should be a single `README.md` file, located at the root of your repository. The images should be placed in a `figures` directory.
-
-Your report should include the following sections:
-
-* **A brief description of your project**: if people exploring GitHub find your repo, without a prior knowledge of the RES course, they should be able to understand what your repo is all about and whether they should look at it more closely.
-
-* **Clear and simple instructions for configuring your tool and running a prank campaign**. If you do a good job, an external user should be able to clone your repo, edit a couple of files and send a batch of e-mails in less than 10 minutes.
-
-* **A concise description of your implementation**: document the key aspects of your code. It is probably a good idea to start with a class diagram. Decide which classes you want to show (focus on the important ones) and describe their responsibilities in text. It is also certainly a good idea to include examples of dialogues between your client and a SMTP server (maybe you also want to include some screenshots here).
-
-* **Instructions for installing and using a mock SMTP server**. The user who wants to experiment with your tool but does not really want to send pranks immediately should be able to use a mock SMTP server. For people who are not familiar with this concept, explain it to them in simple terms. Explain which mock server you have used and how you have set it up.
-
-      
-## Evaluation
-
-* You can work in **groups of 2 students**. 
-
-* You are free to **form these groups as you wish**.
-
-* However, we strongly believe that **everybody will benefit if a more experienced student works with a more junior one in a "smart way"** (i.e. does not do all the work, but leads the way). For the experienced student, it is a good opportunity to develop coaching and mentoring skills. For the junior student, it is a good opportunity to learn good practices from a peer.
-
-* Your code and report will be evaluated and you will get a full lab grade. You will also be asked to **do a 5' demo** of your application. Make sure that you prepare a clear and convincing demo scenario in advance.
-
-
-
-
-
-
-
-
+Authors
+-------------
+Romain Albasini & Dardan Selimi
