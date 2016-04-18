@@ -1,0 +1,12 @@
+Test numéro1
+Bonjour,
+C'est le test 1.
+
+Salut
+====
+Test numéro 2
+Bonjour,
+C'est le test2.
+
+Adieu
+====
